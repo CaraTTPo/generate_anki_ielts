@@ -11,29 +11,44 @@ def languageCss():
  color: black;
  background-color: white;
 }
+.search {
+ font-family: Arial;
+ font-size: 13px;
+ color: blue;
+ padding-bottom: 10px;
+}
 #typeans { font-size:60px !important }
     '''
+    return css
 
 def learnWordTemplate():
-    question_fmt = '''TYPE WHAT YOU HEAR ------------->  {{Audio}}
-</br>
-<div style='font-family: Segoe UI; font-size: 25px; color: blue'>{{Phonetic symbol}}</div>
+    question_fmt = '''{{Audio}}
 </br>
 {{type:Word}}
-</br>
-<div style='font-family: Segoe UI; font-size: 25px; color: green;'>{{Definition}}</div>
-</br>
-{{Picture}}'''
+
+'''
     answer_fmt = '''{{type:Word}}
 </br>
-<div style='font-family: Segoe UI; font-size: 35px; color: blue'>{{Word}}</div>
+<div style='font-family: Segoe UI; font-size: 40px; color: blue'>{{Word}}</div>
 <div style='font-family: Segoe UI; font-size: 25px;'>{{Phonetic symbol}}</div>
 </br>
-LISTEN AGAIN ------------->  {{Audio}}
-</br></br>
-<div style='font-family: Segoe UI; font-size: 25px; color: green;'>{{Definition}}</div>
+{{Audio}}
 </br>
-<div style='font-family: Segoe UI; font-size: 20px; color: black;'>{{Extra information}}</div>
+
+<div class="search">
+  <a href="https://www.oxfordlearnersdictionaries.com/definition/english/{{text:Word}}">Oxford词典</a> // 
+  <a href="https://www.youdao.com/w/{{text:Word}}">有道词典</a> //  
+  <a href="https://www.thefreedictionary.com/{{text:Word}}">The Free Dictionary</a>  //  
+  <a href="https://getyarn.io/yarn-find?text={{text:Word}}">Get Yarn</a>  //  
+  <a href="https://youglish.com/search/{{text:Word}}/all?">相关视频</a>  //  
+  <a href="http://images.google.com/search?tbm=isch&q={{text:Word}}">Image</a>
+</div>
+
+<div style='font-family: Segoe UI; font-size: 25px; color: green;'>definition: {{Definition}}</div>
+</br>
+<div style='font-family: Segoe UI; font-size: 25px; color: black;'>example: {{Extra information}}</div>
+<hr>
+{{Picture}}
     '''
     template = {
         'name': 'learnWord',
