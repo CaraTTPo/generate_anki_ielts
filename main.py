@@ -1,7 +1,9 @@
 import genanki
 import hashlib
 
-def createCss():
+from genanki import package
+
+def languageCss():
     css = '''.card {
  font-family: Segoe UI;
  font-size: 20px;
@@ -9,134 +11,90 @@ def createCss():
  color: black;
  background-color: white;
 }
-
-.search {
- font-family: Arial;
- font-size: 13px;
- color: blue;
- padding-bottom: 10px;
-}
-
-.word {
- font-family: Times New Roman;
- font-size: 60px;
- padding-top: 20px;
- padding-bottom: 10px;
- color: green;
-}
-
-.ipa {
- font-family: Times New Roman;
- font-size: 20px;
-}
-
-.definition {
- text-align: center;
- font-family: Arial;
- font-size: 20px;
- padding-top: 10px;
- padding-bottom: 10px;
-}
-
-.sentence {
- font-family: Arial;
- font-size: 20px;
- padding-left: 10px;
- text-align: left;
- border-left: 2.5px solid lightblue;
-}
-
-.link {
- font-family: Arial;
- font-size: 15px;
- text-align: right;
-}
-
-.block {
- display: inline-block;
- padding-top: 10px;
- padding-bottom: 10px;
- padding-left: 10px;
- padding-right: 10px;
-}
-
-.example {
- font-size: 90%;
-}
-
-.audio {
- font-size: 150%;
-}
+#typeans { font-size:60px !important }
     '''
 
 def learnWordTemplate():
-    question_fmt = '''<div class="word">{{Word}}</div>
-<div class="ipa">{{IPA}}</div>
-<div class="audio">{{Audio}}</div>
-
-<div class="search">
-  <a href="https://dict.laban.vn/find?type=1&query={{text:Word}}">La bàn</a> //  
-  <a href="https://www.thefreedictionary.com/{{text:Word}}">The Free Dictionary</a>  //   
-  <a href="http://images.google.com/search?tbm=isch&q={{text:Word}}">Image</a>
-</div>'''
-    answer_fmt = '''{{FrontSide}}
-<div class="definition">{{edit:Definition}}</div>
-{{Picture}}
-<div class="example">{{edit:Description}}</div>
-
-<div class="block">
-  <div class="sentence">{{edit:Sentence}}</div>
-</div>
+    question_fmt = '''TYPE WHAT YOU HEAR ------------->  {{Audio}}
+</br>
+<div style='font-family: Segoe UI; font-size: 25px; color: blue'>{{Phonetic symbol}}</div>
+</br>
+{{type:Word}}
+</br>
+<div style='font-family: Segoe UI; font-size: 25px; color: green;'>{{Definition}}</div>
+</br>
+{{Picture}}'''
+    answer_fmt = '''{{type:Word}}
+</br>
+<div style='font-family: Segoe UI; font-size: 35px; color: blue'>{{Word}}</div>
+<div style='font-family: Segoe UI; font-size: 25px;'>{{Phonetic symbol}}</div>
+</br>
+LISTEN AGAIN ------------->  {{Audio}}
+</br></br>
+<div style='font-family: Segoe UI; font-size: 25px; color: green;'>{{Definition}}</div>
+</br>
+<div style='font-family: Segoe UI; font-size: 20px; color: black;'>{{Extra information}}</div>
     '''
-    learnWord = {
+    template = {
         'name': 'learnWord',
         'qfmt': question_fmt,
-        'afmt': '{{FrontSide}}<hr id="answer">{{Answer}}',
+        'afmt': answer_fmt,
         }
+    return template
 
-def initSimpleModel(model_name):
+def initLanguageModel(model_name):
     my_model = genanki.Model(
     int(hashlib.md5(model_name.encode()).hexdigest()[:10], 16),
     model_name,
     fields=[
-        {'name': 'Question'},
-        {'name': 'Answer'},
+        {'name': 'Audio'},
+        {'name': 'Phonetic symbol'},
+        {'name': 'Word'},
+        {'name': 'Picture'},
+        {'name': 'Definition'},
+        {'name': 'Extra information'},
     ],
     templates=[
-        {
-        'name': 'learnWord',
-        'qfmt': '{{Question}}',
-        'afmt': '{{FrontSide}}<hr id="answer">{{Answer}}',
-        },
+        learnWordTemplate(),
     ],
-    css="")
+    css=languageCss())
     return my_model
 
-def createSimpleNotes(my_model):
-    my_note1 = genanki.Note(
-    model=my_model,
-    fields=['note1_Question', 'note1_Answer'])
-    my_note2 = genanki.Note(
-    model=my_model,
-    fields=['note2_Question', 'note2_Answer'])
-    return my_note1, my_note2
+def addNote(my_model, my_deck):
+    note1 = genanki.Note(
+        model=my_model,
+        fields=[
+            '[sound:golf_club_sound.mp3]', 
+            "[ɡɒlf klʌb]",
+            'golf club',
+            '<img src="golf_club_img.jpeg">',
+            'A golf club is a social organization which provides a golf course and a building to meet in for its members.',
+            "There s a waiting list to join the golf club Entrance to the golf club is by sponsorship only.", 
+            ]
+        )
+    
+    my_deck.add_note(note1)
 
 
 
 
 def main():
     print("Hello World!")
-    my_model = initSimpleModel('Simple Model')
-    note1, note2 = createSimpleNotes(my_model)
+    my_model = initLanguageModel('Simple Model')
     deck_name = 'DeckExample'
     my_deck = genanki.Deck(
         int(hashlib.md5(deck_name.encode()).hexdigest()[:10], 16),
         deck_name)
+    
+    addNote(my_model, my_deck)
 
-    my_deck.add_note(note1)
-    my_deck.add_note(note2)
+    # To add sounds or images in package
+    my_package = genanki.Package(my_deck)
+    my_package.media_files = ['golf_club_sound.mp3', 
+        'golf_club_img.jpeg']
 
-    genanki.Package(my_deck).write_to_file('/Users/wu/Downloads/genanki_tests/{}.apkg'.format(deck_name))
+
+    my_package.write_to_file('{}.apkg'.format(deck_name))
 
 
 
