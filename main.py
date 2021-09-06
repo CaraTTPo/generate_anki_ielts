@@ -80,15 +80,15 @@ def addNote(my_model, my_deck):
         model=my_model,
         fields=[
             '[sound:golf_club_sound.mp3]', 
-            "[ɡɒlf klʌb]",
+            "['ɡɒlf klʌb]",
             'golf club',
             '<img src="golf_club_img.jpeg">',
             'A golf club is a social organization which provides a golf course and a building to meet in for its members.',
-            "There s a waiting list to join the golf club Entrance to the golf club is by sponsorship only.", 
+            "There's a waiting list to join the golf club Entrance to the golf club is by sponsorship only.", 
             ]
-        )
-    
+        )    
     my_deck.add_note(note1)
+
 
 
 
@@ -106,7 +106,7 @@ def main():
     # To add sounds or images in package
     my_package = genanki.Package(my_deck)
     my_package.media_files = ['golf_club_sound.mp3', 
-        'golf_club_img.jpeg']
+        'medias/golf_club_img.jpeg']
 
 
     my_package.write_to_file('{}.apkg'.format(deck_name))
