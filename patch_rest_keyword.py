@@ -59,7 +59,7 @@ kmf_listening_parts_wlf = ["数字和字母",  #wlf = with less features means �
 
 #issue 样式 名词和分单元
 countword = 0
-partname = "动词"
+partname = "名词"
 with open('kmf_listen_wordlist/kmf_listen_vocab_{}.csv'.format(partname), newline='') as csvfile:
 
     with open('kmf_listen_anki_wordlist/kmf_listen_vocab_{}.csv'.format(partname), 'w', newline='') as write_csvfile:
@@ -75,7 +75,7 @@ with open('kmf_listen_wordlist/kmf_listen_vocab_{}.csv'.format(partname), newlin
             word = ' '.join(wordinrow['answer']) if isinstance(wordinrow['answer'], list) else wordinrow['answer']
             if 'mp3' not in wordinrow['filePath']:
                 print('---'*10)
-                print(word+" **** skip for no mp3 in 动词 part")
+                print(word+" **** skip for no mp3 in {} part".format(partname))
                 print('---'*10)
                 continue
             wordinfor = {
