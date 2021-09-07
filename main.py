@@ -44,10 +44,25 @@ def learnWordTemplate():
   <a href="http://images.google.com/search?tbm=isch&q={{text:Word}}">Image</a>
 </div>
 
-<div style='font-family: Segoe UI; font-size: 25px; color: green;'>definition: {{Definition}}</div>
+<div style='font-family: Segoe UI; font-size: 20px; text-align: left;'>
+<a style="background-color: #0D47A1; color: white">noun: </a>
+<a style="color: black">{{Definition}}</a>
+</div>
 </br>
-<div style='font-family: Segoe UI; font-size: 25px; color: black;'>example: {{Extra information}}</div>
-<hr>
+<div style='font-family: Segoe UI; font-size: 25px; text-align: left;'>
+<a style="background-color: #0D47A1; color: white">example1: </a>
+<a style="color: black">{{Example1}}</a>
+</div>
+<div style='width: 100%;height: 1em;display: inline-block;background: whitle;'></div>
+<div style='font-family: Segoe UI; font-size: 25px; text-align: left;'>
+<a style="background-color: #0D47A1; color: white">example2: </a>
+<a style="color: black">{{Example2}}</a>
+</div>
+<div style='width: 100%;height: 1em;display: inline-block;background: whitle;'></div>
+<div style='font-family: Segoe UI; font-size: 25px;'>
+<a style="background-color: #0D47A1; color: white">synonyms: </a>
+<a style="color: blue">{{Synonyms}}</a>
+</div>
 {{Picture}}
     '''
     template = {
@@ -66,8 +81,11 @@ def initLanguageModel(model_name):
         {'name': 'Phonetic symbol'},
         {'name': 'Word'},
         {'name': 'Picture'},
+        {'name': 'PartOfSpeech'},
         {'name': 'Definition'},
-        {'name': 'Extra information'},
+        {'name': 'Example1'},
+        {'name': 'Example2'},
+        {'name': 'Synonyms'},
     ],
     templates=[
         learnWordTemplate(),
@@ -76,39 +94,119 @@ def initLanguageModel(model_name):
     return my_model
 
 def addNote(my_model, my_deck):
+    note_word = {
+    "lid":203328869,
+    "word":"advertisements", #没有list
+    "mp3":"203328869.mp3", #可能空测试下
+    "img":"203328869.png",#格式jpeg,jpg文件不一定
+    "phonetic_en":"ədˈvəːtɪzm(ə)nt",
+    "partOfSpeech":"noun",
+    "definition":"a notice or announcement in a public medium promoting a product, service, or event or publicizing a job vacancy.",
+    "example1":"advertisements for alcoholic drinks",
+    "example2":"Miss Parrish recently placed an advertisement in the local newspaper.",
+    "example3":"The Treviso team was an effective advertisement for the improving state of Italian club rugby.",
+    "synonyms": [
+        "notice",
+        "announcement",
+        "bulletin",
+        "commercial",
+        "promotion",
+        "blurb",
+        "write-up",
+        "display",
+        "poster",
+        "leaflet",
+        "pamphlet",
+        "flyer",
+        "bill",
+        "handbill",
+        "handout",
+        "circular",
+        "brochure",
+        "sign",
+        "placard",
+        "folder",
+        "dodger",
+        "affiche",
+        "ad",
+        "push",
+        "plug",
+        "puff",
+        "bumf",
+        "advert"
+    ]
+}
     note1 = genanki.Note(
         model=my_model,
         fields=[
-            '[sound:golf_club_sound.mp3]', 
-            "['ɡɒlf klʌb]",
-            'golf club',
-            '<img src="golf_club_img.jpeg">',
-            'A golf club is a social organization which provides a golf course and a building to meet in for its members.',
-            "There's a waiting list to join the golf club Entrance to the golf club is by sponsorship only.", 
-            ]
+            '[sound:{}]'.format(note_word['mp3']), 
+            "uk [{}]".format(note_word['phonetic_en']),
+            note_word['word'],
+            '<img src="{}">'.format(note_word['img']),
+            note_word["partOfSpeech"],
+            note_word["definition"],
+            note_word["example1"],
+            note_word["example2"],
+            note_word["synonyms"],
+        ]
         )    
     my_deck.add_note(note1)
 
+def addNote2(my_model, my_deck):
+    # open file
 
 
+    note_word = {
+    "lid":203328869,
+    "word":"advertisements1", #没有list
+    "mp3":"203328869.mp3", #可能空测试下
+    "img":"203328869.png",#格式jpeg,jpg文件不一定 写的时候确定
+    "phonetic_en":"ədˈvəːtɪzm(ə)nt",
+    "partOfSpeech":"noun1",
+    "definition":"111a notice or announcement in a public medium promoting a product, service, or event or publicizing a job vacancy.",
+    "example1":"advertisements for alcoholic drinks",
+    "example2":"Miss Parrish recently placed an advertisement in the local newspaper.",
+    "synonyms": "notice, announcement, bulletin, commercial, promotion, blurb, write-up, display, poster, leaflet"
+}
+    note1 = genanki.Note(
+        model=my_model,
+        fields=[
+            '[sound:{}]'.format(note_word['mp3']), 
+            "uk [{}]".format(note_word['phonetic_en']),
+            note_word['word'],
+            '<img src="{}">'.format(note_word['img']),
+            note_word["partOfSpeech"],
+            note_word["definition"],
+            note_word["example1"],
+            note_word["example2"],
+            ", ".join(note_word["synonyms"][:10]),
+        ]
+        )    
+    my_deck.add_note(note1)
 
-
+# 每个part是一组
 def main():
     print("Hello World!")
     my_model = initLanguageModel('Simple Model')
-    deck_name = 'DeckExample'
+
+    #每个deck是一个part
+    deck_name = 'DeckExample1'
     my_deck = genanki.Deck(
         int(hashlib.md5(deck_name.encode()).hexdigest()[:10], 16),
         deck_name)
-    
+    my_deck2 = genanki.Deck(
+        int(hashlib.md5("DeckExample2".encode()).hexdigest()[:10], 16),
+        "DeckExample2")
+    my_deck.add_note()
     addNote(my_model, my_deck)
+    addNote2(my_model, my_deck2)
 
     # To add sounds or images in package
-    my_package = genanki.Package(my_deck)
-    my_package.media_files = ['golf_club_sound.mp3', 
-        'medias/golf_club_img.jpeg']
+    my_package = genanki.Package([my_deck, my_deck2])
+    my_package.media_files = ['kmf_listen_wordsmp3/203328869.mp3', 
+        'kmf_listen_wordsimg/203328869.png']
 
-
+  
     my_package.write_to_file('{}.apkg'.format(deck_name))
 
 
