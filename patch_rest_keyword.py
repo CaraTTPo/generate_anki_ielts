@@ -1,7 +1,10 @@
 from typing import DefaultDict
+import urllib
 import requests
 import csv, json
 from pprint import pprint
+from lxml import etree
+from urllib.parse import urlparse, parse_qs
 
 
 #图片
@@ -56,20 +59,19 @@ kmf_listening_parts_wlf = ["数字和字母",  #wlf = with less features means �
 
 #issue 样式 名词和分单元
 countword = 0
-with open('kmf_listen_wordlist/kmf_listen_vocab_动词.csv', newline='') as csvfile:
+partname = "动词"
+with open('kmf_listen_wordlist/kmf_listen_vocab_{}.csv'.format(partname), newline='') as csvfile:
 
-    with open('kmf_listen_anki_wordlist/kmf_listen_vocab_动词.csv', 'w', newline='') as write_csvfile:
+    with open('kmf_listen_anki_wordlist/kmf_listen_vocab_{}.csv'.format(partname), 'w', newline='') as write_csvfile:
         writer = csv.DictWriter(write_csvfile, fieldnames=["lid","word","mp3","img","phonetic_en","partOfSpeech","definition","example1","example2","synonyms"])
         writer.writeheader()
         
         #爬虫
         #写文件
-        flag = 0
+
         reader = csv.DictReader(csvfile)
         for wordinrow in reader:
-
             # if mp3不存在就跳过 否写就可以写
-            # 害怕出错，害怕没用，害怕不够好，那就努力想哪里可能有问题，出错我也有办法，不是吗
             word = ' '.join(wordinrow['answer']) if isinstance(wordinrow['answer'], list) else wordinrow['answer']
             if 'mp3' not in wordinrow['filePath']:
                 print('---'*10)
@@ -96,17 +98,17 @@ with open('kmf_listen_wordlist/kmf_listen_vocab_动词.csv', newline='') as csvf
                 response = requests.get(wordurl)
                 response_json = response.json()
                 if "No Definitions Found" in response.text:
-                    print(word+" **** skip for not found in dictionaryapi")
-                    continue
-                response_json = response_json[0]
-                wordinfor['phonetic_en'] = response_json.get('phonetic', "")
-                wordinfor['partOfSpeech'] = response_json['meanings'][0].get('partOfSpeech', "")
-                wordinfor['definition'] = response_json['meanings'][0]['definitions'][0]['definition']
-                wordinfor['example1'] = response_json['meanings'][0]['definitions'][0].get('example', "")
-                wordinfor['synonyms'] = ", ".join(response_json['meanings'][0]['definitions'][0].get('synonyms', [])[0:10])
+                    print(word+" **** not found in dictionaryapi")
+                else:
+                    response_json = response_json[0]
+                    wordinfor['phonetic_en'] = response_json.get('phonetic', "")
+                    wordinfor['partOfSpeech'] = response_json['meanings'][0].get('partOfSpeech', "")
+                    wordinfor['definition'] = response_json['meanings'][0]['definitions'][0]['definition']
+                    wordinfor['example1'] = response_json['meanings'][0]['definitions'][0].get('example', "")
+                    wordinfor['synonyms'] = ", ".join(response_json['meanings'][0]['definitions'][0].get('synonyms', [])[0:10])
             except Exception as e:
-                # import pdb;pdb.set_trace()
                 print("***"*10)
+                print('dictionaryapi报错')
                 print(e)
                 print(wordurl)
                 pprint(response_json)
@@ -115,9 +117,56 @@ with open('kmf_listen_wordlist/kmf_listen_vocab_动词.csv', newline='') as csvf
 
 
             # 3. 图片 和 example2
+            # 图片https://picdict.youdao.com/search?q=advertisement&le=en
+            ## 图片
+            try:
+                yd_search_url = "https://picdict.youdao.com/search?q={}&le=en".format(word)
+                res = requests.get(yd_search_url)
+                img_res = res.json()
+                url_list = img_res.get('data', {"pic":[]}).get('pic', [])
+                img_url = url_list[0].get("image", "") if url_list else ""
+                if img_url:
+                    if "ydschool-online" in img_url:
+                        url = img_url
+                    elif "ydstatic.com" in img_url:
+                        parsed_url = urlparse(img_url)
+                        url = parse_qs(parsed_url.query).get("url", img_url)
+                        url = url[0] if isinstance(url, list) else url
+                    else:
+                        url = img_url
+                        print("***"*10)
+                        print("有道图片链接格式异常")
+                        print(img_url)
+                        print("***"*10)
+                    urllib.request.urlretrieve(url, "kmf_listen_wordsimg/{}".format(wordinfor['lid']))
+                    wordinfor["img"] = str(wordinfor['lid'])
+                else:
+                    wordinfor["img"] = ""
+            except Exception as e:
+                print("***"*10)
+                print("有道图片搜索异常")
+                print(yd_search_url)
+                print(e)
+                print("***"*10)
             
+            # https://www.youdao.com/w/abuse/
+            ## example2
+            try:
+                url = 'https://www.youdao.com/w/{}/'.format(word)
+                res = requests.get(url)
+                html = etree.HTML(res.content)
+                example_raw = html.xpath('//div[@id="authority"]//li')[0].xpath('./p')[0].xpath('.//text()')
+                example_text = ''.join(example_raw)
+                example_text = example_text.rstrip()
+                wordinfor["example2"] = example_text
+            except Exception as e:
+                print("***"*10)
+                print("有道找example2报错")
+                print(url)
+                print(e)
+                print("***"*10)
+
             #写文件
-            
             writer.writerow(wordinfor)
             countword = countword+1
             print("add word: "+str(countword))
