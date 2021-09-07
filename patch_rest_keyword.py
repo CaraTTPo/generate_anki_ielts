@@ -7,6 +7,7 @@ from lxml import etree
 from urllib.parse import urlparse, parse_qs
 
 
+
 #图片
 #名词 72:94+1
 #形容词_副词 95:101+1
@@ -28,25 +29,25 @@ from urllib.parse import urlparse, parse_qs
 #section3 336:336+1
 #section4 337:339+1
 
-kmf_listening_parts_wmf = ["名词", #wmf=with morefeatures means 有定义和example和synonyms和图片
-"形容词_副词", 
-"吞音_连读", 
-"缩写", 
-"发音", 
-"语法错觉", 
-"动词", 
+kmf_listening_parts_wmf = ["名词", #wmf=with morefeatures means 有定义和example和synonyms和图片 #OK
+"形容词_副词", #OK
+"吞音_连读", #OK？
+"缩写", #OK
+"发音", #OK
+"语法错觉", #OK
+"动词", #OK
 # "数字和字母", 
-# "钱数", 
+"钱数", #OK
 # "地址", 
 # "日期", 
-"专业", 
-"section1", 
-"section2", 
-"section3", 
+# "复数",
+"专业", #OK
+"section1", #OK
+"section2", #OK
+"section3", #OK
 "section4"]
 
-kmf_listening_parts_wlf = ["数字和字母",  #wlf = with less features means 没有定义和example和synonyms和图片
-"钱数", 
+kmf_listening_parts_wlf = ["数字和字母",  #wlf = with less features means 没有定义和example和synonyms和图片 
 "地址", 
 "日期", 
 "复数",
@@ -59,7 +60,7 @@ kmf_listening_parts_wlf = ["数字和字母",  #wlf = with less features means �
 
 #issue 样式 名词和分单元
 countword = 0
-partname = "名词"
+partname = "section4"
 with open('kmf_listen_wordlist/kmf_listen_vocab_{}.csv'.format(partname), newline='') as csvfile:
 
     with open('kmf_listen_anki_wordlist/kmf_listen_vocab_{}.csv'.format(partname), 'w', newline='') as write_csvfile:
@@ -71,8 +72,12 @@ with open('kmf_listen_wordlist/kmf_listen_vocab_{}.csv'.format(partname), newlin
 
         reader = csv.DictReader(csvfile)
         for wordinrow in reader:
+
             # if mp3不存在就跳过 否写就可以写
-            word = ' '.join(wordinrow['answer']) if isinstance(wordinrow['answer'], list) else wordinrow['answer']
+            if "[" in wordinrow['answer']:
+                word = wordinrow['answer'].replace("', '"," ").strip("['").strip("']").replace(" . ",".").replace(" - ","-")
+            else:
+                word = wordinrow['answer']
             if 'mp3' not in wordinrow['filePath']:
                 print('---'*10)
                 print(word+" **** skip for no mp3 in {} part".format(partname))
@@ -126,18 +131,7 @@ with open('kmf_listen_wordlist/kmf_listen_vocab_{}.csv'.format(partname), newlin
                 url_list = img_res.get('data', {"pic":[]}).get('pic', [])
                 img_url = url_list[0].get("image", "") if url_list else ""
                 if img_url:
-                    if "ydschool-online" in img_url:
-                        url = img_url
-                    elif "ydstatic.com" in img_url:
-                        parsed_url = urlparse(img_url)
-                        url = parse_qs(parsed_url.query).get("url", img_url)
-                        url = url[0] if isinstance(url, list) else url
-                    else:
-                        url = img_url
-                        print("***"*10)
-                        print("有道图片链接格式异常")
-                        print(img_url)
-                        print("***"*10)
+                    url = img_url
                     urllib.request.urlretrieve(url, "kmf_listen_wordsimg/{}".format(wordinfor['lid']))
                     wordinfor["img"] = str(wordinfor['lid'])
                 else:
