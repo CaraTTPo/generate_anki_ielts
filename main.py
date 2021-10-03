@@ -23,14 +23,17 @@ def languageCss():
     return css
 
 def learnWordTemplate():
-    question_fmt = '''{{Audio}}
-</br>
-{{type:Word}}
+    question_fmt = '''
+    </br>
+        <div style='font-family: Segoe UI; font-size: 50px; color: Green'>{{text:Word}}</div>
+        <div style='font-family: Segoe UI; font-size: 25px;'>{{Phonetic symbol}}</div>
+
+    </br>
 
 '''
-    answer_fmt = '''{{type:Word}}
+    answer_fmt = '''
 </br>
-<div style='font-family: Segoe UI; font-size: 40px; color: blue'>{{Word}}</div>
+<div style='font-family: Segoe UI; font-size: 50px; color: Green'>{{text:Word}}</div>
 <div style='font-family: Segoe UI; font-size: 25px;'>{{Phonetic symbol}}</div>
 </br>
 {{Audio}}
@@ -67,7 +70,7 @@ def learnWordTemplate():
 {{Picture}}
     '''
     template = {
-        'name': 'learnWord',
+        'name': 'learnWordFamiliar',
         'qfmt': question_fmt,
         'afmt': answer_fmt,
         }
@@ -78,9 +81,9 @@ def initLanguageModel(model_name):
     int(hashlib.md5(model_name.encode()).hexdigest()[:10], 16),
     model_name,
     fields=[
+        {'name': 'Word'},
         {'name': 'Audio'},
         {'name': 'Phonetic symbol'},
-        {'name': 'Word'},
         {'name': 'Picture'},
         {'name': 'PartOfSpeech'},
         {'name': 'Definition'},
@@ -98,7 +101,7 @@ def addNote(my_model, my_deck):
     note_word = {
     "lid":203328869,
     "word":"advertisements", #没有list
-    "mp3":"203328869.mp3", #可能空测试下
+    "mp3":"", #可能空测试下
     "img":"",#格式jpeg,jpg文件不一定
     "phonetic_en":"ədˈvəːtɪzm(ə)nt",
     "partOfSpeech":"noun",
@@ -111,9 +114,9 @@ def addNote(my_model, my_deck):
     note1 = genanki.Note(
         model=my_model,
         fields=[
-            '[sound:{}]'.format(note_word['mp3']), 
-            "uk [{}]".format(note_word['phonetic_en']),
             note_word['word'],
+            "", 
+            "uk [{}]".format(note_word['phonetic_en']),
             '<img src="{}">'.format(note_word['img']) if note_word['img'] else "",
             note_word["partOfSpeech"],
             note_word["definition"],
@@ -128,15 +131,15 @@ def addNote2(my_model, my_deck, partname):
     # open file
 
 
-    with open('kmf_listen_anki_wordlist/kmf_listen_vocab_{}.csv'.format(partname), newline='') as csvfile:
+    with open('3800_anki_wordlists/3800_anki_wordlist{}.csv'.format(partname), newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for note_word in reader:
             note = genanki.Note(
                 model=my_model,
                 fields=[
-                    '[sound:{}]'.format(note_word['mp3']), 
-                    "uk [{}]".format(note_word['phonetic_en']),
                     note_word['word'],
+                    '', 
+                    "uk [{}]".format(note_word['phonetic_en']),
                     '<img src="{}">'.format(note_word['img']) if note_word['img'] else "",
                     note_word["partOfSpeech"],
                     note_word["definition"],
@@ -150,39 +153,33 @@ def addNote2(my_model, my_deck, partname):
 # 每个part是一组
 def main():
     print("Hello World!")
-    my_model = initLanguageModel('Simple Model')
-
-    parts = [("名词", 1135), #wmf=with morefeatures means 有定义和example和synonyms和图片
-        ("吞音_连读", 1333),
-        ("形容词_副词",346),  
-        ("缩写",127), 
-        ("发音",54),
-        ("复数",979), 
-        ("语法错觉",11), 
-        ("动词",109), 
-        ("数字和字母",123), 
-        ("钱数",15), 
-        ("地址",70), 
-        ("日期",43), 
-        ("专业",44), 
-        ("section1",43), 
-        ("section2",40), 
-        ("section3",45), 
-        ("section4",120),
-        ]
+    my_model = initLanguageModel('Learn English Word Familiar')
     
     decks = []
 
-    deck_name = "ielts yasiwang listening vocab" #empty
+    parts = [
+        "1",
+"2",
+"3",
+"4",
+"5",
+"6",
+"7",
+"8",
+"9",
+"10",
+    ]
+
+    deck_name = "雅思标准词汇3800（第二版）" #empty
     my_deck = genanki.Deck(
         int(hashlib.md5(deck_name.encode()).hexdigest()[:10], 16),
-        "雅思王听力词汇")
+            deck_name)
     addNote(my_model, my_deck)
     decks.append(my_deck)
 
 
-    for part,word_length in parts:
-        deck_name = "part_{}_{}".format(part, word_length)
+    for part in parts:
+        deck_name = "雅思标准词汇3800（第二版）::part_{}".format(part)
         my_deck2 = genanki.Deck(
             int(hashlib.md5(deck_name.encode()).hexdigest()[:10], 16),
             deck_name)
@@ -193,14 +190,15 @@ def main():
     # To add sounds or images in package
     
     my_package = genanki.Package(decks)
-    for filename in listdir("kmf_listen_wordsmp3"):
-        my_package.media_files.append("kmf_listen_wordsmp3/{}".format(filename))
-    for filename in listdir("kmf_listen_wordsimg"):
-        my_package.media_files.append("kmf_listen_wordsimg/{}".format(filename))
-
+    # for filename in listdir("kmf_listen_wordsmp3"):
+    #     my_package.media_files.append("kmf_listen_wordsmp3/{}".format(filename))
+    for filename in listdir("3800_anki_img"):
+        my_package.media_files.append("3800_anki_img/{}".format(filename))
+    # my_package.media_files.append("kmf_listen_wordsmp3/{}".format("203328869.mp3"))
+    # my_package.media_files.append("medias/{}".format("203328869.jpeg"))
 
   
-    my_package.write_to_file('{}.apkg'.format("ielts yasiwang listening vocab"))
+    my_package.write_to_file('{}.apkg'.format("雅思标准词汇3800（第二版）"))
 
 
 

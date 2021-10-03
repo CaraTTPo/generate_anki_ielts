@@ -41,11 +41,12 @@ kmf_listening_parts = (
     ["section4", list(range(337, 339+1))],
 )
 
+# https://ielts.kmf.com/vocab/mode?op=trad&type=18 part name
 #example part 名词 23个test
-#part_nums ：1 https://ielts.kmf.com/vocab/pre?id=72
-#part_nums ：2 https://ielts.kmf.com/vocab/pre?id=73
-#part_nums ：...
-#part_nums ：23 https://ielts.kmf.com/vocab/pre?id=94
+#part_test_nums ：1 https://ielts.kmf.com/vocab/pre?id=72
+#part_test_nums ：2 https://ielts.kmf.com/vocab/pre?id=73
+#part_test_nums ：...
+#part_test_nums ：23 https://ielts.kmf.com/vocab/pre?id=94
 word_count = 0
 for part, part_nums in kmf_listening_parts:
 
